@@ -1,0 +1,32 @@
+server:
+  port: 8080
+spring:
+  thymeleaf:
+    cache: false
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 1032603414176-uvsf96ntecq28nev3t97pop61127rqhq.apps.googleusercontent.com
+            client-secret: U0xGUhFswVK7bsxbeiu1zf0g
+            scope: profile
+            redirect-uri-template: '{baseUrl}/login/oauth2/code/{registrationId}'
+          github:
+            client-id: 26063af5396945129a0c
+            client-secret: f1b7e297b8d2471064186bdf5e47eaa51ef2c8c8
+            redirect-uri-template: '{baseUrl}/login/oauth2/code/{registrationId}'
+          line:
+            client-id: your-app-client-id
+            client-secret: your-app-client-secret
+            provider: LINE
+            scope: profile
+            redirect-uri-template: '{baseUrl}/login/oauth2/code/{registrationId}'
+            client-authentication-method: basic
+            authorization-grant-type: authorization_code
+        provider:
+          LINE:
+            authorization-uri: https://access.line.me/oauth2/v2.1/authorize
+            token-uri: https://api.line.me/oauth2/v2.1/token
+            user-info-uri: https://api.line.me/v2/profile
+            user-name-attribute: userId 

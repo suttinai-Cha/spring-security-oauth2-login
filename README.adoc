@@ -1,0 +1,219 @@
+= spring-security-oauth2-login
+
+This guide provides instructions on setting up the sample application with OAuth 2.0 Login using an OAuth 2.0 Provider or OpenID Connect 1.0 Provider.
+The sample application uses Spring Boot 2.0.0.M6 and the `spring-security-oauth2-client` module which is new in Spring Security 5.0.
+
+The following sections provide detailed steps for setting up OAuth 2.0 Login for these Providers:
+
+* <<google-login, Google>>
+* <<github-login, GitHub>>
+* <<line-login, Line>>
+
+[[google-login]]
+== Login with Google
+
+This section shows how to configure the sample application using Google as the Authentication Provider and covers the following topics:
+
+* <<google-initial-setup,Initial setup>>
+* <<google-redirect-uri,Setting the redirect URI>>
+* <<google-application-config,Configure application.yml>>
+* <<google-boot-application,Boot up the application>>
+
+[[google-initial-setup]]
+=== Initial setup
+
+To use Google's OAuth 2.0 authentication system for login, you must set up a project in the Google API Console to obtain OAuth 2.0 credentials.
+
+NOTE: https://developers.google.com/identity/protocols/OpenIDConnect[Google's OAuth 2.0 implementation] for authentication conforms to the
+ https://openid.net/connect/[OpenID Connect 1.0] specification and is https://openid.net/certification/[OpenID Certified].
+
+Follow the instructions on the https://developers.google.com/identity/protocols/OpenIDConnect[OpenID Connect] page, starting in the section, "Setting up OAuth 2.0".
+
+After completing the "Obtain OAuth 2.0 credentials" instructions, you should have a new OAuth Client with credentials consisting of a Client ID and a Client Secret.
+
+[[google-redirect-uri]]
+=== Setting the redirect URI
+
+The redirect URI is the path in the application that the end-user's user-agent is redirected back to after they have authenticated with Google
+and have granted access to the OAuth Client _(created in the previous step)_ on the Consent page.
+
+In the "Set a redirect URI" sub-section, ensure that the *Authorized redirect URIs* field is set to `http://localhost:8080/login/oauth2/code/google`.
+
+TIP: The default redirect URI template is `{baseUrl}/login/oauth2/code/{registrationId}`.
+ The *_registrationId_* is a unique identifier for the `ClientRegistration`.
+
+[[google-application-config]]
+=== Configure application.yaml
+
+Now that you have a new OAuth Client with Google, you need to configure the application to use the OAuth Client for the _authentication flow_. To do so:
+
+. Go to `application.yaml` and set the following configuration:
++
+[source,yaml]
+----
+spring:
+  security:
+    oauth2:
+      client:
+        registration:	<1>
+          google:		<2>
+            client-id: google-client-id
+            client-secret: google-client-secret
+----
++
+.OAuth Client properties
+====
+<1> `spring.security.oauth2.client.registration` is the base property prefix for OAuth Client properties.
+<2> Following the base property prefix is the ID for the `ClientRegistration`, such as google.
+====
+
+. Replace the values in the `client-id` and `client-secret` property with the OAuth 2.0 credentials you created earlier.
+
+[[google-boot-application]]
+=== Boot up the application
+
+Launch the Spring Boot 2.0 sample and go to `http://localhost:8080`.
+You are then redirected to the default _auto-generated_ login page, which displays a link for Google.
+
+Click on the Google link, and you are then redirected to Google for authentication.
+
+After authenticating with your Google account credentials, the next page presented to you is the Consent screen.
+The Consent screen asks you to either allow or deny access to the OAuth Client you created earlier.
+Click *Allow* to authorize the OAuth Client to access your email address and basic profile information.
+
+At this point, the OAuth Client retrieves your email address and basic profile information
+from the https://openid.net/specs/openid-connect-core-1_0.html#UserInfo[UserInfo Endpoint] and establishes an authenticated session.
+
+[[github-login]]
+== Login with GitHub
+
+This section shows how to configure the sample application using GitHub as the Authentication Provider and covers the following topics:
+
+* <<github-register-application,Register OAuth application>>
+* <<github-application-config,Configure application.yml>>
+* <<github-boot-application,Boot up the application>>
+
+[[github-register-application]]
+=== Register OAuth application
+
+To use GitHub's OAuth 2.0 authentication system for login, you must https://github.com/settings/applications/new[Register a new OAuth application].
+
+When registering the OAuth application, ensure the *Authorization callback URL* is set to `http://localhost:8080/login/oauth2/code/github`.
+
+The Authorization callback URL (redirect URI) is the path in the application that the end-user's user-agent is redirected back to after they have authenticated with GitHub
+and have granted access to the OAuth application on the _Authorize application_ page.
+
+TIP: The default redirect URI template is `{baseUrl}/login/oauth2/code/{registrationId}`.
+ The *_registrationId_* is a unique identifier for the `ClientRegistration`.
+
+[[github-application-config]]
+=== Configure application.yaml
+
+Now that you have a new OAuth application with GitHub, you need to configure the application to use the OAuth application for the _authentication flow_. To do so:
+
+. Go to `application.yaml` and set the following configuration:
++
+[source,yaml]
+----
+spring:
+  security:
+    oauth2:
+      client:
+        registration:	<1>
+          github:		<2>
+            client-id: github-client-id
+            client-secret: github-client-secret
+----
++
+.OAuth Client properties
+====
+<1> `spring.security.oauth2.client.registration` is the base property prefix for OAuth Client properties.
+<2> Following the base property prefix is the ID for the `ClientRegistration`, such as github.
+====
+
+. Replace the values in the `client-id` and `client-secret` property with the OAuth 2.0 credentials you created earlier.
+
+[[github-boot-application]]
+=== Boot up the application
+
+Launch the Spring Boot 2.0 sample and go to `http://localhost:8080`.
+You are then redirected to the default _auto-generated_ login page, which displays a link for GitHub.
+
+Click on the GitHub link, and you are then redirected to GitHub for authentication.
+
+After authenticating with your GitHub credentials, the next page presented to you is "Authorize application".
+This page will ask you to *Authorize* the application you created in the previous step.
+Click _Authorize application_ to allow the OAuth application to access your personal user data information.
+
+At this point, the OAuth Client retrieves your personal user information
+from the UserInfo Endpoint and establishes an authenticated session.
+
+[TIP]
+For detailed information returned from the UserInfo Endpoint, see the API documentation
+for https://developer.github.com/v3/users/#get-the-authenticated-user["Get the authenticated user"].
+
+[[line-login]]
+== Login with Line
+
+This section shows how to configure the sample application using Line as the Authentication Provider and covers the following topics:
+
+* <<line-register-application,Create New Provider>>
+* <<line-application-config,Configure application.yml>>
+* <<line-boot-application,Boot up the application>>
+
+[[line-register-application]]
+=== Create New Provider
+
+To use Line's OAuth 2.0 authentication system for login, you must first https://developers.line.biz/console/[Create New Provider].
+
+For the field *Valid OAuth redirect URIs*, enter `http://localhost:8080/login/oauth2/code/line` then click _Save Changes_.
+
+The OAuth redirect URI is the path in the application that the end-user's user-agent is redirected back to after they have authenticated with Line
+and have granted access to the application on the _Authorize application_ page.
+
+TIP: The default redirect URI template is `{baseUrl}/login/oauth2/code/{registrationId}`.
+ The *_registrationId_* is a unique identifier for the `ClientRegistration`.
+
+[[line-application-config]]
+=== Configure application.yaml
+
+Now that you have created a new application with Line, you need to configure the sample application to use the application for the _authentication flow_. To do so:
+
+. Go to `application.yaml` and set the following configuration:
++
+[source,yaml]
+----
+spring:
+  security:
+    oauth2:
+      client:
+        registration:	<1>
+          line:		<2>
+            client-id: your-app-client-id
+            client-secret: your-app-client-secret
+            provider: LINE
+            scope: profile
+            redirect-uri-template: '{baseUrl}/login/oauth2/code/{registrationId}'
+            client-authentication-method: basic
+            authorization-grant-type: authorization_code
+        provider:
+          LINE:
+            authorization-uri: https://access.line.me/oauth2/v2.1/authorize
+            token-uri: https://api.line.me/oauth2/v2.1/token
+            user-info-uri: https://api.line.me/v2/profile
+            user-name-attribute: userId 
+----
++
+.OAuth Client properties
+====
+<1> `spring.security.oauth2.client.registration` is the base property prefix for OAuth Client properties.
+<2> Following the base property prefix is the ID for the `ClientRegistration`, such as line.
+====
+
+. Replace the values in the `client-id` and `client-secret` property with the OAuth 2.0 credentials you created earlier.
+
+[[line-boot-application]]
+=== Boot up the application
+
+Launch the Spring Boot 2.0 sample and go to `http://localhost:8080`.
+You are then redirected to the default _auto-generated_ login page, which displays a link for Line.
